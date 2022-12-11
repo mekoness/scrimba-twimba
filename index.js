@@ -13,6 +13,9 @@ document.addEventListener('click', function(e){
     }
     else if(e.target.id === 'tweet-btn'){
         handleTweetBtnClick();
+    }
+    else if(e.target.id === 'reply-btn'){
+        handleReplyBtnClick(e.target.dataset.replybtn);
     };
 });
  
@@ -43,7 +46,7 @@ function handleRetweetClick(tweetId){
 };
 
 function handleReplyClick(replyId){
-    document.getElementById(`replies-${replyId}`).classList.toggle('hidden');    
+    document.getElementById(`replies-${replyId}`).classList.toggle('hidden');
 };
 
 function handleTweetBtnClick(){
@@ -63,6 +66,22 @@ function handleTweetBtnClick(){
         });
     render();
     tweetInput.value = '';
+    };
+};
+
+function handleReplyBtnClick(replyId){
+    const replyInput = document.getElementById(`reply-input-${replyId}`);
+    const targetTweetObj = tweetsData.filter(tweet => tweet.uuid === replyId)[0];
+
+    if(replyInput.value){
+        targetTweetObj.replies.push({
+            handle: `@Scrimba`,
+            profilePic: `images/scrimbalogo.png`,
+            tweetText: replyInput.value
+        });
+    render();
+    replyInput.value = '';
+    document.getElementById(`replies-${replyId}`).classList.toggle('hidden');
     };
 };
 
@@ -99,7 +118,12 @@ function getFeedHtml(){
             );
         };
 
-        
+        const replyArea = `
+            <div class="reply-area">
+                <textarea placeholder="Reply to ${tweet.handle}" class="reply-input" id="reply-input-${tweet.uuid}"></textarea>
+                <button id="reply-btn" data-replybtn="${tweet.uuid}">Reply</button>
+            </div>
+            `
                   
         feedHtml += `
             <div class="tweet">
@@ -130,11 +154,14 @@ function getFeedHtml(){
                         </div>   
                     </div>            
                 </div>
-                <div class="hidden" id="replies-${tweet.uuid}">
+                <div class="hidden" id="replies-${tweet.uuid}" data-reply="${tweet.uuid}">
                     ${repliesHtml}
-                </div>   
+                    <div id="reply-area-${tweet.uuid}">
+                    ${replyArea}
+                    </div>
+                </div>
             </div>
-`
+            `
    });
    return feedHtml;
 };

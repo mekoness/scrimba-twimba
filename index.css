@@ -30,6 +30,10 @@ i{
   color: limegreen;
 }
 
+.trash-btn:hover {
+    color: red
+}
+
 /* layout */
 
 main, header{
@@ -65,6 +69,7 @@ textarea{
 
 .reply-area{
     margin-left: auto;
+    margin-top: .5rem;
     width: 85%;
 }
 

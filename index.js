@@ -1,5 +1,6 @@
 import { tweetsData } from './data.js';
 import { v4 as uuidv4 } from 'https://jspm.dev/uuid';
+const tweetsFromLocalStorage = JSON.parse(localStorage.getItem("myTweets"))
 
 document.addEventListener('click', function(e){
     if(e.target.dataset.like){
@@ -16,6 +17,9 @@ document.addEventListener('click', function(e){
     }
     else if(e.target.id === 'reply-btn'){
         handleReplyBtnClick(e.target.dataset.replybtn);
+    }
+    else if(e.target.dataset.trash){
+        handleTrashBtnClick(e.target.dataset.trash);
     };
 });
  
@@ -49,6 +53,15 @@ function handleReplyClick(replyId){
     document.getElementById(`replies-${replyId}`).classList.toggle('hidden');
 };
 
+function handleTrashBtnClick(tweetId){
+    tweetsData.filter((tweet, index) => {
+        if (tweet.uuid === tweetId) {
+            tweetsData.splice(index, 1)
+        };
+    });
+    render()
+};
+
 function handleTweetBtnClick(){
     const tweetInput = document.getElementById('tweet-input');
 
@@ -64,6 +77,7 @@ function handleTweetBtnClick(){
             isRetweeted: false,
             uuid: uuidv4()
         });
+
     render();
     tweetInput.value = '';
     };
@@ -100,7 +114,13 @@ function getFeedHtml(){
         if (tweet.isRetweeted){
             retweetIconClass = 'retweeted';
         };
-        
+
+        let trashBtnClass = 'hidden'
+
+        if (tweet.handle === '@Scrimba'){
+            trashBtnClass = ''
+        }
+
         let repliesHtml = '';
         
         if(tweet.replies.length > 0){
@@ -135,21 +155,22 @@ function getFeedHtml(){
                         <div class="tweet-details">
                             <span class="tweet-detail">
                                 <i class="fa-regular fa-comment-dots"
-                                data-reply="${tweet.uuid}"
-                                ></i>
+                                data-reply="${tweet.uuid}"></i>
                                 ${tweet.replies.length}
                             </span>
                             <span class="tweet-detail">
                                 <i class="fa-solid fa-heart ${likeIconClass}"
-                                data-like="${tweet.uuid}"
-                                ></i>
+                                data-like="${tweet.uuid}"></i>
                                 ${tweet.likes}
                             </span>
                             <span class="tweet-detail">
                                 <i class="fa-solid fa-retweet ${retweetIconClass}"
-                                data-retweet="${tweet.uuid}"
-                                ></i>
+                                data-retweet="${tweet.uuid}"></i>
                                 ${tweet.retweets}
+                            </span>
+                            <span class="tweet-detail ${trashBtnClass}">
+                                <i class="fa-solid fa-trash trash-btn"
+                                data-trash="${tweet.uuid}"></i>
                             </span>
                         </div>   
                     </div>            
@@ -170,4 +191,4 @@ function render(){
     document.getElementById('feed').innerHTML = getFeedHtml();
 }
 
-render();
+render()
